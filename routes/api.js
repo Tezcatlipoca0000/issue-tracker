@@ -2,16 +2,15 @@
 const mongoose = require('mongoose'),
       Schema = mongoose.Schema,
       issue = new Schema({
-        __v: {type: Number, select: false},
+        assigned_to: String,
+        status_text: String,
+        open: Boolean,
         issue_title: {type: String, required: true},
         issue_text: {type: String, required: true},
+        created_by: {type: String, required: true},
         created_on: {type: Date, default: Date.now},
         updated_on: {type: Date, default: Date.now},
-        created_by: {type: String, required: true},
-        assigned_to: String,
-        open: Boolean,
-        status_text: String,
-      });
+      }, {versionKey: false});
 
 module.exports = function (app) {
 
@@ -29,44 +28,52 @@ module.exports = function (app) {
       let project = req.params.project,
           Issue = mongoose.model(project, issue),
           newIssue = new Issue({
+            assigned_to: req.body.assigned_to,
+            status_text: req.body.status_text,
+            open: true,
             issue_title: req.body.issue_title,
             issue_text: req.body.issue_text,
+            created_by: req.body.created_by,
             created_on: new Date(),
             updated_on: new Date(),
-            created_by: req.body.created_by,
-            assigned_to: req.body.assigned_to,
-            open: true,
-            status_text: req.body.status_text
           });
       newIssue.save((err, data) => {
-        err ? console.log('error saving', err) : res.json(data);
+        err ? res.json({error: 'required field(s) missing'}) : res.json(data);
       });
     })
     
     .put(function (req, res){
       let project = req.params.project,
           Issue = mongoose.model(project, issue);
-      Issue.findOne({_id: req.body._id}, (err, doc) => {
-        if (err) {
-          console.log('error finding id', err);
-        } else {
-          for (let i of Object.keys(req.body)) {
-            if (doc.get(i)) doc[i] = req.body[i];
+      if (req.body._id === '') {
+        res.json({error: 'missing _id'});
+      } else {
+        Issue.findOne({_id: req.body._id}, (err, doc) => {
+          if (err || doc === null) {
+            res.json({error: 'could not update', '_id': req.body._id});
+          } else {
+            for (let i of Object.keys(req.body)) {
+              if(i !== '_id') doc[i] = req.body[i];
+            }
+            doc.updated_on = new Date();
+            doc.save((err) => {
+              err ? res.json({error: 'could not update', '_id': req.body._id}) : res.json({result: 'successfully updated', '_id': req.body._id });
+            });
           }
-          doc.updated_on = new Date();
-          doc.save((err, data) => {
-            err ? console.log('error saving after update', err) : res.json(data);
-          });
-        }
-      });
+        });
+      }
     })
     
     .delete(function (req, res){
       let project = req.params.project,
           Issue = mongoose.model(project, issue);
-      Issue.deleteOne({_id: req.body._id}, (err, doc) => {
-        err ? console.log('error deleting', err) : res.json(doc);
-      });
+      if (req.body._id === '') {
+        res.json({error: 'missing _id'});
+      } else {
+        Issue.deleteOne({_id: req.body._id}, (err, doc) => {
+          err ? res.json({error: 'could not delete', '_id': doc._id}) : res.json({result: 'successfully deleted', '_id': doc._id});
+        });
+      }
     });
     
 };
