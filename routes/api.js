@@ -2,14 +2,15 @@
 const mongoose = require('mongoose'),
       Schema = mongoose.Schema,
       issue = new Schema({
-        issue_title: String,
-        issue_text: String,
+        __v: {type: Number, select: false},
+        issue_title: {type: String, required: true},
+        issue_text: {type: String, required: true},
         created_on: {type: Date, default: Date.now},
         updated_on: {type: Date, default: Date.now},
-        created_by: String,
+        created_by: {type: String, required: true},
         assigned_to: String,
         open: Boolean,
-        status_text: String
+        status_text: String,
       });
 
 module.exports = function (app) {
@@ -45,8 +46,18 @@ module.exports = function (app) {
     .put(function (req, res){
       let project = req.params.project,
           Issue = mongoose.model(project, issue);
-      Issue.findByIdAndUpdate(req.body._id, {open: false}, {returnDocument: 'after'}, (err, doc) => {
-        err ? console.log('error updating', err) : res.json(doc);
+      Issue.findOne({_id: req.body._id}, (err, doc) => {
+        if (err) {
+          console.log('error finding id', err);
+        } else {
+          for (let i of Object.keys(req.body)) {
+            if (doc.get(i)) doc[i] = req.body[i];
+          }
+          doc.updated_on = new Date();
+          doc.save((err, data) => {
+            err ? console.log('error saving after update', err) : res.json(data);
+          });
+        }
       });
     })
     
