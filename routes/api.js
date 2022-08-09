@@ -18,9 +18,10 @@ module.exports = function (app) {
   
     .get(function (req, res){
       let project = req.params.project,
-          Issue = mongoose.model(project, issue);
-      Issue.find({}, (err, docs) => {
-        err ? console.log('finding error', err) : res.json(docs);
+          Issue = mongoose.model(project, issue),
+          queries = req.query;
+      Issue.find(queries, (err, docs) => {
+        (err || docs === null) ? res.json({error: 'error'}) : (console.log(docs), res.json(docs))
       });
     })
     
@@ -45,7 +46,7 @@ module.exports = function (app) {
     .put(function (req, res){
       let project = req.params.project,
           Issue = mongoose.model(project, issue);
-      if (req.body._id === '') {
+      if (!req.body._id) {
         res.json({error: 'missing _id'});
       } else {
         Issue.findOne({_id: req.body._id}, (err, doc) => {
@@ -67,11 +68,12 @@ module.exports = function (app) {
     .delete(function (req, res){
       let project = req.params.project,
           Issue = mongoose.model(project, issue);
-      if (req.body._id === '') {
+      if (!req.body._id) {
         res.json({error: 'missing _id'});
       } else {
-        Issue.deleteOne({_id: req.body._id}, (err, doc) => {
-          err ? res.json({error: 'could not delete', '_id': doc._id}) : res.json({result: 'successfully deleted', '_id': doc._id});
+        // Model.deleteOne doesn't pass the test here
+        Issue.findOneAndDelete({_id: req.body._id}, (err, doc) => {
+          (err || doc === null) ? res.json({error: 'could not delete', '_id': req.body._id}) : res.json({result: 'successfully deleted', '_id': req.body._id});
         });
       }
     });
