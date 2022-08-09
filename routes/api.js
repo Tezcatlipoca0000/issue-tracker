@@ -22,7 +22,6 @@ module.exports = function (app) {
           queries = req.query;
       console.log('getting ', project, '& filtered ', queries);
       Issue.find(queries, (err, docs) => {
-        //console.log('GET the err & docs values ', err, docs);
         (err || docs === null) ? (console.log('error getting docs ', err, docs), res.json({error: 'error'})) : (console.log('the found docs & typeof ', err, docs, typeof docs), res.json(docs))
       });
     })
@@ -42,7 +41,6 @@ module.exports = function (app) {
           });
       console.log('posting on ', project, 'the issue ', newIssue);
       newIssue.save((err, data) => {
-        //console.log('POST the err & data values ', err, data);
         err ? (console.log('error posting new issue ', err, data), res.json({error: 'required field(s) missing'})) : (console.log('new issue posted ', err, data), res.json(data));
       });
     })
@@ -54,6 +52,9 @@ module.exports = function (app) {
       if (!req.body._id) {
         console.log('update missing id ', req.body);
         res.json({error: 'missing _id'});
+      } else if ((Object.keys(req.body)).length < 2) {
+        console.log('update fields empty ', req.body);
+        res.json({error: 'no update field(s) sent', '_id': req.body._id});
       } else {
         Issue.findOne({_id: req.body._id}, (err, doc) => {
           if (err || doc === null) {
