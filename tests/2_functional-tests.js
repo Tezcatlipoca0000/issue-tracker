@@ -11,7 +11,7 @@ suite('Functional Tests', function() {
   test('Create an issue with every field: POST request to /api/issues/{project}', function(done) {
     chai
         .request(server)
-        .post('/api/issues/:project')
+        .post('/api/issues/apitest')
         .type('form')
         .send({
             assigned_to: 'chai tst1 asigned_to',
@@ -31,7 +31,7 @@ suite('Functional Tests', function() {
   test('Create an issue with only required fields: POST request to /api/issues/{project}', function(done) {
     chai
         .request(server)
-        .post('/api/issues/:project')
+        .post('/api/issues/apitest')
         .type('form')
         .send({
             issue_title: 'chai tst2 issue title',
@@ -49,7 +49,7 @@ suite('Functional Tests', function() {
   test('Create an issue with missing required fields: POST request to /api/issues/{project}', function(done) {
     chai
         .request(server)
-        .post('/api/issues/:project')
+        .post('/api/issues/apitest')
         .type('form')
         .send({
             issue_text: 'chai tst3 issue text',
@@ -71,6 +71,21 @@ suite('Functional Tests', function() {
             assert.isNull(err, 'There was no error');
             assert.equal(res.status, 200, 'res.status is equal to 200');
             assert.isArray(res.body, 'res.body is an array');
+        });
+        done();
+  });
+
+  test('View issues on a project with one filter: GET request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .get('api/issues/apitest')
+        .query({open: 'true'})
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            res.body.forEach(n => {
+                assert.notPropertyVal(n, 'open', 'false', 'not a single obj in here has open set to false');
+            });
         });
         done();
   });
