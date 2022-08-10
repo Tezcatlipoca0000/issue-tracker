@@ -96,6 +96,16 @@ suite('Functional Tests', function() {
         .request(server)
         .get('/api/issues/apitest')
         .query({created_by: 'Alice', assigned_to: 'Bob'})
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            assert.isArray(res.body, 'res.body is an array');
+            res.body.forEach(n => {
+                assert.propertyVal(n, 'created_by', 'Alice', 'every obj in here has "created_by" set to "Alice"');
+                assert.propertyVal(n, 'assigned_to', 'Bob', 'every obj in here has "assigned_to" set to "Bob"');
+            });
+        });
+        done();
   });
 
 });
