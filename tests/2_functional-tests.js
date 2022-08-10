@@ -91,4 +91,11 @@ suite('Functional Tests', function() {
         done();
   });
 
+  test('View issues on a project with multiple filters: GET request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .get('/api/issues/apitest')
+        .query({created_by: 'Alice', assigned_to: 'Bob'})
+  });
+
 });
