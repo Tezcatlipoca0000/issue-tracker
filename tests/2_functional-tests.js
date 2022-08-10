@@ -108,4 +108,10 @@ suite('Functional Tests', function() {
         done();
   });
 
+  test('Update one field on an issue: PUT request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .put
+  });
+
 });
