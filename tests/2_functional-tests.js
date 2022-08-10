@@ -147,4 +147,20 @@ suite('Functional Tests', function() {
         done();
   });
 
+  test('Update an issue with missing _id: PUT request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .put('/api/issues/apitest')
+        .type('form')
+        .send({
+            status_text: 'updated status'
+        })
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            assert.propertyVal(res.body, 'error', 'missing _id', 'response is error: missing _id');
+        });
+        done();
+  });
+
 });
