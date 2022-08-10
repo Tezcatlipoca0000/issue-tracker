@@ -125,7 +125,7 @@ suite('Functional Tests', function() {
         .end(function(err, res) {
             assert.isNull(err, 'There was no error');
             assert.equal(res.status, 200, 'res.status is equal to 200');
-            // assrt has prperty result
+            assert.property(res.body, 'result', 'response is result');
         });
         done();
   });
