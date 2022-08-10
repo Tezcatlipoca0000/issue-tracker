@@ -163,4 +163,20 @@ suite('Functional Tests', function() {
         done();
   });
 
+  test('Update an issue with no fields to update: PUT request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .put('/api/issues/apitest')
+        .type('form')
+        .send({
+            _id: '62f3e0ca76dd6bf14e02cb9e'
+        })
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            assert.propertyVal(res.body, 'error', 'no update field(s) sent', 'response is error: no update field(s) sent');
+        });
+        done();
+  });
+
 });
