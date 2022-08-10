@@ -46,4 +46,21 @@ suite('Functional Tests', function() {
         done();
   });
 
+  test('Create an issue with missing required fields: POST request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .post('/api/issues/:project')
+        .type('form')
+        .send({
+            issue_text: 'chai tst3 issue text',
+            created_by: 'chai tst3 created by'
+        })
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            assert.deepEqual(res.body, { error: 'required field(s) missing' }, 'res.body is {error: "required field(s) missing"}');
+        });
+        done();
+  });
+
 });
