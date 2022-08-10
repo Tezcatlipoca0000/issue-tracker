@@ -111,7 +111,23 @@ suite('Functional Tests', function() {
   test('Update one field on an issue: PUT request to /api/issues/{project}', function(done) {
     chai
         .request(server)
-        .put
+        .put('/api/issues/apitest')
+        .type('form')
+        .send({
+            _id: '62f3e0ca76dd6bf14e02cb9e',
+            assigned_to: 'Yadira',
+            status_text: 'updated status',
+            open: 'false',
+            issue_title: 'updated title',
+            issue_text: 'updated text',
+            created_by: 'Zelda',
+        })
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            // assrt has prperty result
+        });
+        done();
   });
 
 });
