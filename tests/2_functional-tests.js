@@ -63,4 +63,16 @@ suite('Functional Tests', function() {
         done();
   });
 
+  test('View issues on a project: GET request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .get('/api/issues/apitest')
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            assert.isArray(res.body, 'res.body is an array');
+        });
+        done();
+  });
+
 });
