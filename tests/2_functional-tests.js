@@ -14,11 +14,11 @@ suite('Functional Tests', function() {
         .post('/api/issues/apitest')
         .type('form')
         .send({
-            assigned_to: 'chai tst1 asigned_to',
+            assigned_to: 'Bob',
             status_text: 'chai tst1 status_text',
             issue_title: 'chai tst1 issue title',
             issue_text: 'chai tst1 issue text',
-            created_by: 'chai tst1 created by'
+            created_by: 'Alice'
         })
         .end(function(err, res) {
             assert.isNull(err, 'There was no error');
@@ -36,7 +36,7 @@ suite('Functional Tests', function() {
         .send({
             issue_title: 'chai tst2 issue title',
             issue_text: 'chai tst2 issue text',
-            created_by: 'chai tst2 created by'
+            created_by: 'Chuck'
         })
         .end(function(err, res) {
             assert.isNull(err, 'There was no error');
@@ -78,13 +78,14 @@ suite('Functional Tests', function() {
   test('View issues on a project with one filter: GET request to /api/issues/{project}', function(done) {
     chai
         .request(server)
-        .get('api/issues/apitest')
-        .query({open: 'true'})
+        .get('/api/issues/apitest')
+        .query({created_by: 'Alice'})
         .end(function(err, res) {
             assert.isNull(err, 'There was no error');
             assert.equal(res.status, 200, 'res.status is equal to 200');
+            assert.isArray(res.body, 'res.body is an array');
             res.body.forEach(n => {
-                assert.notPropertyVal(n, 'open', 'false', 'not a single obj in here has open set to false');
+                assert.propertyVal(n, 'created_by', 'Alice', 'every obj in here has "created_by" set to "Alice"');
             });
         });
         done();
