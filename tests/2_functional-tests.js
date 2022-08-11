@@ -2,6 +2,7 @@ const chaiHttp = require('chai-http');
 const chai = require('chai');
 const assert = chai.assert;
 const server = require('../server');
+const { request } = require('chai');
 
 const mongoose = require('mongoose'),
       Schema = mongoose.Schema,
@@ -132,13 +133,13 @@ suite('Functional Tests', function() {
             issue_text: 'chai tst7 issue text',
             created_by: 'Dave'
         })
-        .end(function(err, res) {
+        .end(function(err, resp) {
             chai
                 .request(server)
                 .put('/api/issues/apitest')
                 .type('form')
                 .send({
-                    _id: res.body._id,
+                    _id: resp.body._id,
                     assigned_to: 'Yadira',
                 })
                 .end(function(err, res) {
@@ -160,13 +161,13 @@ suite('Functional Tests', function() {
             issue_text: 'chai tst8 issue text',
             created_by: 'Dave'
         })
-        .end(function(err, res) {
+        .end(function(err, resp) {
             chai
                 .request(server)
                 .put('/api/issues/apitest')
                 .type('form')
                 .send({
-                    _id: res.body._id,
+                    _id: resp.body._id,
                     assigned_to: 'Yadira',
                     status_text: 'updated status',
                     open: 'false',
@@ -202,17 +203,28 @@ suite('Functional Tests', function() {
   test('Update an issue with no fields to update: PUT request to /api/issues/{project}', function(done) {
     chai
         .request(server)
-        .put('/api/issues/apitest')
+        .post('/api/issues/apitest')
         .type('form')
         .send({
-            _id: '62f3e0ca76dd6bf14e02cb9e'
+            issue_title: 'chai tst10 issue title',
+            issue_text: 'chai tst10 issue text',
+            created_by: 'Ed'
         })
-        .end(function(err, res) {
-            assert.isNull(err, 'There was no error');
-            assert.equal(res.status, 200, 'res.status is equal to 200');
-            assert.propertyVal(res.body, 'error', 'no update field(s) sent', 'response is error: no update field(s) sent');
+        .end(function(erro, resp) {
+            chai
+                .request(server)
+                .put('/api/issues/apitest')
+                .type('form')
+                .send({
+                    _id: resp.body._id
+                })
+                .end(function(err, res) {
+                    assert.isNull(err, 'There was no error');
+                    assert.equal(res.status, 200, 'res.status is equal to 200');
+                    assert.propertyVal(res.body, 'error', 'no update field(s) sent', 'response is error: no update field(s) sent');
+                });
+                done();
         });
-        done();
   });
 
   test('Update an issue with an invalid _id: PUT request to /api/issues/{project}', function(done) {
@@ -240,19 +252,29 @@ suite('Functional Tests', function() {
   test('Delete an issue: DELETE request to /api/issues/{project}', function(done) {
     chai
         .request(server)
-        .delete('/api/issues/apitest')
-        //.type('form')
+        .post('/api/issues/apitest')
+        .type('form')
         .send({
-            _id: '62f3e0ca76dd6bf14e02cb9e'
+            issue_title: 'chai tst12 issue title',
+            issue_text: 'chai tst12 issue text',
+            created_by: 'Fred'
         })
-        .end(function(err, res) {
-            assert.isNull(err, 'There was no error');
-            assert.equal(res.status, 200, 'res.status is equal to 200');
-            assert.propertyVal(res.body, 'result', 'successfully deleted', 'response is result: successfully deleted');
-        });
-        done();
-  });
-
+        .end(function(erro, resp) {
+            chai
+                .request(server)
+                .delete('/api/issues/apitest')
+                //.type('form')
+                .send({
+                    _id: resp.body._id
+                })
+                .end(function(err, res) {
+                    assert.isNull(err, 'There was no error');
+                    assert.equal(res.status, 200, 'res.status is equal to 200');
+                    assert.propertyVal(res.body, 'result', 'successfully deleted', 'response is result: successfully deleted');
+                });
+                done();
+         });
+    });
 });
 
 
