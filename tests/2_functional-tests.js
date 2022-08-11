@@ -276,4 +276,17 @@ suite('Functional Tests', function() {
             done();
     });
 
+    test('Delete an issue with missing _id: DELETE request to /api/issues/{project}', function(done) {
+        chai
+            .request(server)
+            .delete('/api/issues/apitest')
+            .send({_id: ''})
+            .end(function(err, res) {
+                assert.isNull(err, 'There was no error');
+                assert.equal(res.status, 200, 'res.status is equal to 200');
+                assert.propertyVal(res.body, 'error', 'missing _id', 'response is error: missing _id');
+            });
+            done();
+    });
+
 });
