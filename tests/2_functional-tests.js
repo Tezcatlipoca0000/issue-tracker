@@ -179,4 +179,26 @@ suite('Functional Tests', function() {
         done();
   });
 
+  test('Update an issue with an invalid _id: PUT request to /api/issues/{project}', function(done) {
+    chai
+        .request(server)
+        .put('/api/issues/apitest')
+        .type('form')
+        .send({
+            _id: '052f3e0c6dd6bf1e02cb9e',
+            assigned_to: 'Yadira',
+            status_text: 'updated status',
+            open: 'false',
+            issue_title: 'updated title',
+            issue_text: 'updated text',
+            created_by: 'Zelda',
+        })
+        .end(function(err, res) {
+            assert.isNull(err, 'There was no error');
+            assert.equal(res.status, 200, 'res.status is equal to 200');
+            assert.propertyVal(res.body, 'error', 'could not update', 'response is error: could not update');
+        });
+        done();
+  });
+
 });
